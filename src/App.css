@@ -1,0 +1,261 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  margin: 0 10px;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-toggle button.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.date-navigation, .week-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.date-navigation h2, .week-navigation h2 {
+  margin: 0;
+}
+
+.task-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.task-form input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.task-form button {
+  padding: 8px 16px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.task-form button:last-child {
+  background: #f44336;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border-left: 4px solid #4CAF50;
+}
+
+.task.completed {
+  opacity: 0.7;
+  border-left-color: #9E9E9E;
+}
+
+.task-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+}
+
+.task-time {
+  font-weight: bold;
+  color: #333;
+  min-width: 60px;
+}
+
+.task-title {
+  flex: 1;
+}
+
+.task.completed .task-title {
+  text-decoration: line-through;
+  color: #777;
+}
+
+.task-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.task-actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.task-actions button:first-child {
+  background: #2196F3;
+  color: white;
+}
+
+.task-actions button:nth-child(2) {
+  background: #FFC107;
+  color: black;
+}
+
+.task-actions button:last-child {
+  background: #f44336;
+  color: white;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.day-column {
+  background: #f9f9f9;
+  border-radius: 4px;
+  padding: 10px;
+  min-height: 200px;
+}
+
+.day-header {
+  font-weight: bold;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+/* For the weekly view dates */
+
+.clickable-date {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-date:hover {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.day-header {
+  padding: 8px;
+  text-align: center;
+}
+
+.current-day {
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+}
+
+.current-day:hover {
+  background-color: #3e8e41;
+}
+
+/* Weekly View Specific Styles */
+
+.weekly-task {
+  padding: 8px;
+  margin-bottom: 5px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  border-left: 3px solid #4CAF50;
+}
+
+.weekly-task.completed {
+  opacity: 0.7;
+  border-left-color: #9E9E9E;
+}
+
+.weekly-task-info {
+  display: flex;
+  gap: 8px;
+}
+
+.weekly-task-time {
+  font-weight: bold;
+  color: #333;
+  min-width: 50px;
+}
+
+.weekly-task-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/*
+.weekly-task.completed .weekly-task-title {
+  text-decoration: line-through;
+  color: #777;
+}
+*/
+.weekly-task.completed .weekly-task-title::before {
+  content: "✓";
+  margin-right: 5px;
+  color: #4CAF50;
+}
+
+.weekly-task-title:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+.weekly-task.completed {
+  background-color: #f8f8f8;
+}
+
+@media (max-width: 768px) {
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .task-form {
+    flex-direction: column;
+  }
+}
