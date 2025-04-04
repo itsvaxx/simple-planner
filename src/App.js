@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import './App.css';
 
 function App() {
@@ -30,9 +32,10 @@ function App() {
     time: ''
   });
 
-  const [view, setView] = useState('daily');
+  const [view, setView] = useState('daily'); // Added 'monthly' as an option
   const [currentDate, setCurrentDate] = useState(today);
   const [editingTask, setEditingTask] = useState(null);
+  const [calendarDate, setCalendarDate] = useState(new Date());
 
   // Get week start date (Sunday)
   const getWeekStartDate = (dateString) => {
@@ -130,16 +133,34 @@ function App() {
     setView('daily');
   };
 
+  const handleCalendarChange = (date) => {
+    setCurrentDate(getLocalDateString(date));
+    setCalendarDate(date);
+    setView('daily');
+  };
+
   // Fixed task filtering
   const filteredTasks = view === 'daily' 
     ? tasks.filter(task => task.date === currentDate)
-    : tasks.filter(task => {
+    : view === 'weekly' 
+    ? tasks.filter(task => {
         const taskDate = parseDateString(task.date);
         const startDate = parseDateString(weekStart);
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
         return taskDate >= startDate && taskDate <= endDate;
-      });
+      })
+    : []; // For monthly view, we'll just show the calendar
+
+  // Mark dates that have tasks
+  const tileContent = ({ date, view }) => {
+    if (view === 'month') {
+      const dateString = getLocalDateString(date);
+      const hasTasks = tasks.some(task => task.date === dateString);
+      return hasTasks ? <div className="task-dot"></div> : null;
+    }
+    return null;
+  };
 
   return (
     <div className="app">
@@ -158,9 +179,25 @@ function App() {
         >
           Weekly View
         </button>
+        <button 
+          onClick={() => setView('monthly')} 
+          className={view === 'monthly' ? 'active' : ''}
+        >
+          Monthly View
+        </button>
       </div>
 
-      {view === 'daily' ? (
+      {view === 'monthly' ? (
+        <div className="monthly-view">
+          <Calendar
+            onChange={handleCalendarChange}
+            value={calendarDate}
+            calendarType="gregory"
+            tileContent={tileContent}
+            className="main-calendar"
+          />
+        </div>
+      ) : view === 'daily' ? (
         <div className="daily-view">
           <div className="date-navigation">
             <button onClick={() => changeDate(-1)}>Previous</button>
@@ -196,7 +233,7 @@ function App() {
                 setEditingTask(null);
                 setNewTask({
                   title: '',
-                  date: new Date().toISOString().split('T')[0],
+                  date: today,
                   time: ''
                 });
               }}>
@@ -235,21 +272,17 @@ function App() {
             <button onClick={() => changeWeek(1)}>Next Week</button>
           </div>
 
-          {/*In your WeeklyView rendering*/}
           <div className="week-grid">
             {Array.from({ length: 7 }).map((_, index) => {
-              const date = new Date(weekStart);
+              const date = new Date(parseDateString(weekStart));
               date.setDate(date.getDate() + index);
-              const dateString = date.toISOString().split('T')[0];
+              const dateString = getLocalDateString(date);
               const dayTasks = tasks.filter(task => task.date === dateString);
               
               return (
                 <div key={index} className="day-column">
-                  {/* Make the date header clickable */}
                   <div
-                    className={`day-header clickable-date ${
-                      dateString === currentDate ? 'current-day' : ''
-                    }`}
+                    className={`day-header ${dateString === currentDate ? 'current-day' : ''}`}
                     onClick={() => handleDateClick(dateString)}
                   >
                     {formatDisplayDate(dateString)}
@@ -267,7 +300,7 @@ function App() {
             })}
           </div>
         </div>
-        )}
+      )}
     </div>
   );
 }
