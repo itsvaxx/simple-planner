@@ -347,6 +347,7 @@ h1 {
 
   .main-calendar {
     height: 450px;
+    font-size: 1.1em;
   }
 }
 
@@ -354,5 +355,10 @@ h1 {
   .main-calendar {
     height: 350px;
     padding: 6px;
+    font-size: 1em;
+  }
+
+  .react-calendar__navigation__label__labelText {
+    font-size: 1.3em;
   }
 }
