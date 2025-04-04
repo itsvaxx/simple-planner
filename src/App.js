@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
 
 function App() {
@@ -161,155 +160,114 @@ function App() {
         </button>
       </div>
 
-      <AnimatePresence mode="wait">
-        {view === 'daily' ? (
-          <motion.div
-            key="daily"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ 
-              duration: 0.3,
-              x: { type: "spring", stiffness: 300, damping: 30 }
-            }}
-          >
-            <div className="daily-view">
-              <div className="date-navigation">
-                <button onClick={() => changeDate(-1)}>Previous</button>
-                <motion.h2
-                  key={currentDate}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {formatDisplayDate(currentDate)}
-                </motion.h2>
-                <button onClick={() => changeDate(1)}>Next</button>
-              </div>
+      {view === 'daily' ? (
+        <div className="daily-view">
+          <div className="date-navigation">
+            <button onClick={() => changeDate(-1)}>Previous</button>
+            <h2>{formatDisplayDate(currentDate)}</h2>
+            <button onClick={() => changeDate(1)}>Next</button>
+          </div>
+          
+          <div className="task-form">
+            <input
+              type="text"
+              name="title"
+              placeholder="Task title"
+              value={newTask.title}
+              onChange={handleInputChange}
+            />
+            <input
+              type="date"
+              name="date"
+              value={newTask.date}
+              onChange={handleInputChange}
+            />
+            <input
+              type="time"
+              name="time"
+              value={newTask.time}
+              onChange={handleInputChange}
+            />
+            <button onClick={addTask}>
+              {editingTask ? 'Update Task' : 'Add Task'}
+            </button>
+            {editingTask && (
+              <button onClick={() => {
+                setEditingTask(null);
+                setNewTask({
+                  title: '',
+                  date: new Date().toISOString().split('T')[0],
+                  time: ''
+                });
+              }}>
+                Cancel
+              </button>
+            )}
+          </div>
+
+          <div className="task-list">
+            {filteredTasks.length === 0 ? (
+              <p>No tasks for this day</p>
+            ) : (
+              filteredTasks.map(task => (
+                <div key={task.id} className={`task ${task.completed ? 'completed' : ''}`}>
+                  <div className="task-info">
+                    <span className="task-time">{task.time}</span>
+                    <span className="task-title">{task.title}</span>
+                  </div>
+                  <div className="task-actions">
+                    <button onClick={() => toggleComplete(task.id)}>
+                      {task.completed ? 'Undo' : 'Complete'}
+                    </button>
+                    <button onClick={() => editTask(task)}>Edit</button>
+                    <button onClick={() => deleteTask(task.id)}>Delete</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="weekly-view">
+          <div className="week-navigation">
+            <button onClick={() => changeWeek(-1)}>Previous Week</button>
+            <h2>Week of {formatDisplayDate(weekStart)}</h2>
+            <button onClick={() => changeWeek(1)}>Next Week</button>
+          </div>
+
+          {/*In your WeeklyView rendering*/}
+          <div className="week-grid">
+            {Array.from({ length: 7 }).map((_, index) => {
+              const date = new Date(weekStart);
+              date.setDate(date.getDate() + index);
+              const dateString = date.toISOString().split('T')[0];
+              const dayTasks = tasks.filter(task => task.date === dateString);
               
-              <div className="task-form">
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Task title"
-                  value={newTask.title}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="date"
-                  name="date"
-                  value={newTask.date}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="time"
-                  name="time"
-                  value={newTask.time}
-                  onChange={handleInputChange}
-                />
-                <button onClick={addTask}>
-                  {editingTask ? 'Update Task' : 'Add Task'}
-                </button>
-                {editingTask && (
-                  <button onClick={() => {
-                    setEditingTask(null);
-                    setNewTask({
-                      title: '',
-                      date: new Date().toISOString().split('T')[0],
-                      time: ''
-                    });
-                  }}>
-                    Cancel
-                  </button>
-                )}
-              </div>
-
-              <div className="task-list">
-                {filteredTasks.length === 0 ? (
-                  <p>No tasks for this day</p>
-                ) : (
-                  filteredTasks.map(task => (
-                    <div key={task.id} className={`task ${task.completed ? 'completed' : ''}`}>
-                      <div className="task-info">
-                        <span className="task-time">{task.time}</span>
-                        <span className="task-title">{task.title}</span>
-                      </div>
-                      <div className="task-actions">
-                        <button onClick={() => toggleComplete(task.id)}>
-                          {task.completed ? 'Undo' : 'Complete'}
-                        </button>
-                        <button onClick={() => editTask(task)}>Edit</button>
-                        <button onClick={() => deleteTask(task.id)}>Delete</button>
+              return (
+                <div key={index} className="day-column">
+                  {/* Make the date header clickable */}
+                  <div
+                    className={`day-header clickable-date ${
+                      dateString === currentDate ? 'current-day' : ''
+                    }`}
+                    onClick={() => handleDateClick(dateString)}
+                  >
+                    {formatDisplayDate(dateString)}
+                  </div>
+                  {dayTasks.map(task => (
+                    <div key={task.id} className={`weekly-task ${task.completed ? 'completed' : ''}`}>
+                      <div className="weekly-task-info">
+                        <span className="weekly-task-time">{task.time}</span>
+                        <span className="weekly-task-title">{task.title}</span>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="weekly"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="weekly-view">
-              <div className="week-navigation">
-                <button onClick={() => changeWeek(-1)}>Previous Week</button>
-                <motion.h2
-                  key={weekStart}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  Week of {formatDisplayDate(weekStart)}
-                </motion.h2>
-                <button onClick={() => changeWeek(1)}>Next Week</button>
-              </div>
-
-              {/*In your WeeklyView rendering*/}
-              <motion.div
-                key={weekStart}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.7 }}
-                className="week-grid"
-              >
-                {Array.from({ length: 7 }).map((_, index) => {
-                  const date = new Date(weekStart);
-                  date.setDate(date.getDate() + index);
-                  const dateString = date.toISOString().split('T')[0];
-                  const dayTasks = tasks.filter(task => task.date === dateString);
-                  
-                  return (
-                    <div key={index} className="day-column">
-                      {/* Make the date header clickable */}
-                      <div
-                        className={`day-header clickable-date ${
-                          dateString === currentDate ? 'current-day' : ''
-                        }`}
-                        onClick={() => handleDateClick(dateString)}
-                      >
-                        {formatDisplayDate(dateString)}
-                      </div>
-                      {dayTasks.map(task => (
-                        <div key={task.id} className={`weekly-task ${task.completed ? 'completed' : ''}`}>
-                          <div className="weekly-task-info">
-                            <span className="weekly-task-time">{task.time}</span>
-                            <span className="weekly-task-title">{task.title}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </motion.div>
-            </div>
-          </motion.div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }
