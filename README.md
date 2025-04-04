@@ -1,4 +1,4 @@
-
+![Demo Screenshot](./simpleplannerss.png)
 
 ## 1. Run the following in cmd (or download zip):
 ### `git clone https://github.com/itsvaxx/simple-planner.git`
