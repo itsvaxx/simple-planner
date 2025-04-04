@@ -1,5 +1,5 @@
 ## 1. Run the following in cmd:
-### `git clone https://github.com/itsvaxx/simpleplanner.git`
+### `git clone https://github.com/itsvaxx/simple-planner.git`
 
 ## 2. Install dependencies:
 ### `npm install`
