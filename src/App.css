@@ -297,8 +297,8 @@ h1 {
   bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   background: #1890ff;
   border-radius: 50%;
 }
