@@ -26,16 +26,25 @@ function App() {
 
   // Initialize with today's date
   const today = getLocalDateString();
-  const [newTask, setNewTask] = useState({
-    title: '',
-    date: today,
-    time: ''
-  });
-
-  const [view, setView] = useState('daily'); // Added 'monthly' as an option
+  const [view, setView] = useState('daily');
   const [currentDate, setCurrentDate] = useState(today);
   const [editingTask, setEditingTask] = useState(null);
   const [calendarDate, setCalendarDate] = useState(new Date());
+
+  // Initialize newTask with currentDate
+  const [newTask, setNewTask] = useState({
+    title: '',
+    date: currentDate,
+    time: ''
+  });
+
+  // Keep newTask.date in sync with currentDate
+  useEffect(() => {
+    setNewTask(prev => ({
+      ...prev,
+      date: currentDate
+    }));
+  }, [currentDate]);
 
   // Get week start date (Sunday)
   const getWeekStartDate = (dateString) => {
@@ -84,7 +93,7 @@ function App() {
 
     setNewTask({
       title: '',
-      date: today,
+      date: currentDate,
       time: ''
     });
   };
@@ -131,25 +140,49 @@ function App() {
   const handleDateClick = (dateString) => {
     setCurrentDate(dateString);
     setView('daily');
+    // Update the newTask date to match the clicked date
+    setNewTask(prev => ({
+      ...prev,
+      date: dateString
+    }));
   };
 
   const handleCalendarChange = (date) => {
-    setCurrentDate(getLocalDateString(date));
+    const dateString = getLocalDateString(date);
+    setCurrentDate(dateString);
     setCalendarDate(date);
     setView('daily');
+    // Update the newTask date to match the selected date
+    setNewTask(prev => ({
+      ...prev,
+      date: dateString
+    }));
   };
 
-  // Fixed task filtering
+  // Function to sort tasks by time
+  const sortTasksByTime = (taskList) => {
+    return [...taskList].sort((a, b) => {
+      // Handle empty time strings by putting them at the end
+      if (!a.time && !b.time) return 0;
+      if (!a.time) return 1;
+      if (!b.time) return -1;
+      
+      // Compare time strings
+      return a.time.localeCompare(b.time);
+    });
+  };
+
+  // Fixed task filtering with sorting
   const filteredTasks = view === 'daily' 
-    ? tasks.filter(task => task.date === currentDate)
+    ? sortTasksByTime(tasks.filter(task => task.date === currentDate))
     : view === 'weekly' 
-    ? tasks.filter(task => {
+    ? sortTasksByTime(tasks.filter(task => {
         const taskDate = parseDateString(task.date);
         const startDate = parseDateString(weekStart);
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + 6);
         return taskDate >= startDate && taskDate <= endDate;
-      })
+      }))
     : []; // For monthly view, we'll just show the calendar
 
   // Mark dates that have tasks
@@ -164,7 +197,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>SimplePlanner</h1>
+      <h1>SIMPLE PLANNER</h1>
       
       <div className="view-toggle">
         <button 
@@ -233,7 +266,7 @@ function App() {
                 setEditingTask(null);
                 setNewTask({
                   title: '',
-                  date: today,
+                  date: currentDate,
                   time: ''
                 });
               }}>
@@ -277,7 +310,7 @@ function App() {
               const date = new Date(parseDateString(weekStart));
               date.setDate(date.getDate() + index);
               const dateString = getLocalDateString(date);
-              const dayTasks = tasks.filter(task => task.date === dateString);
+              const dayTasks = sortTasksByTime(tasks.filter(task => task.date === dateString));
               
               return (
                 <div key={index} className="day-column">
